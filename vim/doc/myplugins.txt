@@ -1,0 +1,53 @@
+*myplugins.txt*
+*myplugins* 
+
+List of plugin commands and custom key mappings so that I can remember them
+
+Vim keybindings
+===============
+
+F2  - toggle past mode
+w!! - sudo write file
+\<char> (ex; \w) - vim easy motion jump to locations in file
+,pt - perltidy file
+,tp - perltidy selection
+,dl - enter directory list for path of current file
+,zna - zap non-ascii chars in doc
+<select text> ,tb<char> - tabularize selection based on <char> (ex: align assignments on '=' char)
+
+Plugin keybindings
+==================
+
+F8  - toggle tag bar sidebar
+,w  - move forward to camel cased word (also ,b and ,e)
+
+Plugin commands
+===============
+
+cs<old_surround_char><new_surround_char> - ex: cs"' to change double quotes to single quotes
+ys<selector><symbol> - ex: ysiw' to surround the current word with single quotes
+Gblame - git blame current file
+buf<tab> - open buf explorer window
+
+==============================================================================
+ACTIVE PLUGINS (ctrl-] to jump to description, ctlr-T to jump back)
+
+bufexplorer         |bufexplorer.txt|
+camelcasemotion     |camelcasemotion.txt|
+ctrlp               |ctrlp.txt|
+surround            |surround|
+tabular             |tabular.txt|
+tagbar              |tagbar.txt|
+vim-easymotion      |easymotion.txt|
+vim-fugitive        |fugitive|
+        
+==============================================================================
+PASSIVE PLUGINS
+
+delimitMate         |delimitMate.txt|
+syntastic           |syntastic|
+vim-airline         |airline|
+
+
+
+

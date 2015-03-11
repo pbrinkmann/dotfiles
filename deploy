@@ -1,0 +1,122 @@
+#!/bin/bash
+
+#
+# This copies all of the necessary files out of here and into their proper locations.
+# It also makes a backup of any changed files, and shows a diff of the changes.
+#
+# For certain configs, if a ~/.${config_name}_extra file exists, its contents will
+# be added to the one from git.  This allows servers that are under configuration
+# management to have specific commmands added that are unique to that environment.
+#
+
+mkdir -p ~/.going
+
+DATESTR=`date "+%Y%m%d_%H%M%S"`
+
+function backupfile {
+    if [[ -e ~/"$1" ]]
+    then
+        mv ~/"$1" ~/"${1}_${DATESTR}"
+    fi
+}
+
+for dotfile in bash_profile \
+               gitignore    \
+               pylintrc     \
+               vim          \
+               vimrc        \
+               screenrc
+do
+    if ! diff -r --brief ~/."${dotfile}" "$dotfile" 
+    then
+        if [[ ! -d $dotfile ]]
+        then
+            echo "changes to ~/.${dotfile}:"
+            diff -C 2 ~/."${dotfile}" "$dotfile" 
+        fi
+
+        backupfile ".$dotfile"
+        cp -r "$dotfile" ~/."${dotfile}"
+    fi
+done
+
+function get_extra_config_contents()
+{
+    local base_file=$1
+    cat $base_file
+    if [[ -e ~/.${base_file}_extra ]]
+    then
+        cat ~/.${base_file}_extra
+    fi
+}
+
+function install_config_with_extra()
+{
+    local base_file="$1"
+    local dest_file="$2"
+    local dest_file_full=~/"$dest_file"
+
+    if ! diff --brief "$dest_file_full" <(get_extra_config_contents $base_file)
+    then
+        echo "changes to $dest_file:"
+        diff -C 2 "$dest_file_full" <(get_extra_config_contents $base_file)
+        backupfile "$dest_file"
+        get_extra_config_contents $base_file >  "$dest_file_full"
+    fi
+
+}
+
+
+install_config_with_extra bashrc .bashrc
+install_config_with_extra gitconfig .gitconfig
+mkdir -p ~/.ssh
+install_config_with_extra sshconfig .ssh/config
+chmod 400 ~/.ssh/config
+
+# This will color STDERR console output red of any program
+# Does not seem to work on Centos
+if [[ -e /etc/debian_version  && $(which gcc) != "" ]]
+then
+    ( cd stderred && make lib64/stderred.so )
+fi
+
+
+function install_pkgs() {
+   pkgs=$@ 
+
+    if [[ -e /etc/redhat-release ]]
+    then
+        do_install=0
+        for pkg in $pkgs
+        do
+            if [[ $(rpm -qa $pkg) == "" ]]
+            then
+                do_install=1
+            fi
+        done
+        if [[ $do_install == 1 ]]
+        then
+            sudo yum install $pkgs
+        fi
+    elif [[ -e /etc/debian_version ]]
+    then
+        do_install=0
+        for pkg in $pkgs
+        do
+            dpkg --list $pkg > /dev/null 2>&1
+            if [[ $? != 0 ]]
+            then
+                do_install=1
+            fi
+        done
+        if [[ $do_install == 1 ]]
+        then
+            sudo aptitude install $pkgs
+        fi
+    else
+        echo "Unkown platform, not checking for $pkg"
+    fi
+}
+
+echo "To install dev packages, run: install_pkgs pylint tree ctags"
+

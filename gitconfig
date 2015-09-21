@@ -17,4 +17,4 @@
 [diff]
     tool = vimdiff
 [help]
-	autocorrect = 10
+	autocorrect = 25

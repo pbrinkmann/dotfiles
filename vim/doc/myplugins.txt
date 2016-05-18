@@ -20,6 +20,8 @@ Plugin keybindings
 
 F8  - toggle tag bar sidebar
 ,w  - move forward to camel cased word (also ,b and ,e)
+,a  - "ArgWrap" which takes a list of things like function args on a single line and wraps them on multiple lines
+,tb - "Tabularize" <char> - aligns column on char, useful for "=" to align right side of multiple assignments
 
 Plugin commands
 ===============
@@ -40,6 +42,7 @@ tabular             |tabular.txt|
 tagbar              |tagbar.txt|
 vim-easymotion      |easymotion.txt|
 vim-fugitive        |fugitive|
+vim-argwrap         |argwrap|
         
 ==============================================================================
 PASSIVE PLUGINS

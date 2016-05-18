@@ -90,6 +90,8 @@ map ,tb :Tabularize /
 " open/close the tag bar
 nmap <F8> :TagbarToggle<CR>
 
+" Toggle argwrap
+noremap <silent> ,a :ArgWrap<CR>
 
 """
 """ End Custom Commmands

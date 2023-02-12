@@ -1,21 +1,33 @@
 # CONTRIBUTING
 - - -
-1\. [Bug reports / GitHub issues](#bugreps)  
-2\. [Submitting a patch](#patches)  
-3\. [General style notes](#generalstyle)  
-4\. [Syntax checker notes](#checkerstyle)  
+1\. [Deprecation note](#deprecation)  
+2\. [Bug reports / GitHub issues](#bugreps)  
+3\. [Submitting a patch](#patches)  
+4\. [General style notes](#generalstyle)  
+5\. [Syntax checker notes](#checkerstyle)  
 - - -
+
+<a name="deprecation"></a>
+
+## 1. Deprecation note
+
+This project is no longer maintained.  If you need a syntax checking plugin
+for [Vim][vim] you might be interested in Syntastic's spiritual succesor,
+[ALE][ale].  Although it shares no code with syntastic and it takes a very
+different approach to design, [ALE][ale] can be considered a natural evolution
+of syntastic in terms of goals and functionality.  Check it out, you probably
+won't be disappointed.
 
 <a name="bugreps"></a>
 
-## 1. Bug reports / GitHub issues
+## 2. Bug reports / GitHub issues
 
 Please note that the preferred channel for posting bug reports is the
-[issue tracker at GitHub][0].  Reports posted elsewhere are less likely
+[issue tracker at GitHub][bug_tracker]. Reports posted elsewhere are less likely
 to be seen by the core team.
 
 When reporting a bug make sure you search the existing GitHub issues
-for the same/similar issues.  If you find one, feel free to add a `+1`
+for the same/similar issues. If you find one, feel free to add a `+1`
 comment with any additional information that may help us solve the
 issue.
 
@@ -26,7 +38,7 @@ When creating a new issue be sure to state the following:
 * the version of syntastic you are using (see `:SyntasticInfo`).
 
 For syntax checker bugs also state the version of the checker executable
-that you are using.  Adding debugging information is typically useful
+that you are using. Adding debugging information is typically useful
 too:
 
 * open a file handled by your checker;
@@ -36,17 +48,17 @@ too:
 
 <a name="patches"></a>
 
-## 2. Submitting a patch
+## 3. Submitting a patch
 
-Before you consider adding features to syntastic, _please_ spend a few
-minutes (re-)reading the latest version of the [manual][1].  Syntastic
-is changing rapidly at times, and it's quite possible that some of the
-features you want to add exist already.
+Before you consider adding features to syntastic, _please_ spend a few minutes
+(re-)reading the latest version of the [manual][manual]. Syntastic is changing
+rapidly at times, and it's possible that some features you want to add exist
+already.
 
 To submit a patch:
 
-* fork the [repo][2] on GitHub;
-* make a [topic branch][3] and start hacking;
+* fork the [repo][github] on GitHub;
+* make a [topic branch][branches] and start hacking;
 * submit a pull request based off your topic branch.
 
 Small, focused patches are preferred.
@@ -54,12 +66,12 @@ Small, focused patches are preferred.
 Large changes to the code should be discussed with the core team first.
 Create an issue and explain your plan and see what we say.
 
-Also make sure to update the manual whenever applicable.  Nobody can use
+Also, make sure to update the manual whenever applicable. Nobody can use
 features that aren't documented.
 
 <a name="generalstyle"></a>
 
-## 3. General style notes
+## 4. General style notes
 
 Follow the coding conventions/styles used in the syntastic core:
 
@@ -69,14 +81,14 @@ Follow the coding conventions/styles used in the syntastic core:
 * don't use `l:` prefixes for variables unless actually required (i.e.
 almost never);
 * code for maintainability; we would rather a function be a couple of
-lines longer and have (for example) some [explaining variables][4] to
+lines longer and have (for example) some [explaining variables][variables] to
 aid readability.
 
 <a name="checkerstyle"></a>
 
-## 4. Syntax checker notes
+## 5. Syntax checker notes
 
-Make sure to read the [guide][5] if you plan to add new syntax checkers.
+Make sure to read the [guide][guide] if you plan to add new syntax checkers.
 
 Use the existing checkers as templates, rather than writing everything
 from scratch.
@@ -97,9 +109,11 @@ let errorformat =
     \ '%-G%.%#'
 ```
 
-[0]: https://github.com/scrooloose/syntastic/issues
-[1]: https://github.com/scrooloose/syntastic/blob/master/doc/syntastic.txt
-[2]: https://github.com/scrooloose/syntastic
-[3]: https://github.com/dchelimsky/rspec/wiki/Topic-Branches#using-topic-branches-when-contributing-patches
-[4]: http://www.refactoring.com/catalog/extractVariable.html
-[5]: https://github.com/scrooloose/syntastic/wiki/Syntax-Checker-Guide
+[ale]:              https://github.com/dense-analysis/ale
+[bug_tracker]:      https://github.com/vim-syntastic/syntastic/issues
+[manual]:           https://github.com/vim-syntastic/syntastic/blob/master/doc/syntastic.txt
+[github]:           https://github.com/vim-syntastic/syntastic
+[branches]:         https://github.com/dchelimsky/rspec/wiki/Topic-Branches#using-topic-branches-when-contributing-patches
+[variables]:        http://www.refactoring.com/catalog/extractVariable.html
+[guide]:            https://github.com/vim-syntastic/syntastic/wiki/Syntax-Checker-Guide
+[vim]:              http://www.vim.org/

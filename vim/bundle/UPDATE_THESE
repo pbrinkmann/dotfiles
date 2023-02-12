@@ -7,10 +7,15 @@ git subtree pull --squash -P vim/bundle/vim-fugitive https://github.com/tpope/vi
 git subtree pull --squash -P vim/bundle/delimitMate https://github.com/Raimondi/delimitMate.git master
 git subtree pull --squash -P vim/bundle/tabular https://github.com/godlygeek/tabular.git master
 git subtree pull --squash -P vim/bundle/vim-argwrap https://github.com/FooSoft/vim-argwrap.git master
-
+git subtree pull --squash -P vim/bundle/vim-surround https://github.com/FooSoft/vim-surround.git master
+git subtree pull --squash -P vim/bundle/bufexplorer https://github.com/jlanzarotta/bufexplorer.git master
+git subtree pull --squash -P vim/bundle/CamelCaseMotion https://github.com/bkad/CamelCaseMotion.git master
 
 #For example, to add new ones:
 #
 #git subtree add --squash --prefix=vim/bundle/vim-fugitive https://github.com/tpope/vim-fugitive.git master
 #
 #And add to the above list
+
+
+git subtree add --squash --prefix=vim/bundle/CamelCaseMotion https://github.com/bkad/CamelCaseMotion.git master

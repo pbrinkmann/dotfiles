@@ -12,32 +12,20 @@ if !exists('s:options')
   let s:options = {}
 endif
 
-function! s:set(name, value, ...) "{{{
-  let scope = a:0 ? a:1 : 's'
+function! s:set(name, value) "{{{
   let bufnr = bufnr('%')
-  if !exists('s:options[bufnr]')
+  if !has_key(s:options, bufnr)
     let s:options[bufnr] = {}
   endif
-  if scope == 's'
-    let name = 's:options.' . bufnr . '.' . a:name
-  else
-    let name = scope . ':delimitMate_' . a:name
-    if exists('name')
-      exec 'unlet! ' . name
-    endif
-  endif
-  exec 'let ' . name . ' = a:value'
+  let s:options[bufnr][a:name] = a:value
 endfunction "}}}
 
-function! s:get(name, ...) "{{{
-  if a:0 == 2
-    return deepcopy(get(a:2, 'delimitMate_' . a:name, a:1))
-  elseif a:0 == 1
-    let bufoptions = get(s:options, bufnr('%'), {})
-    return deepcopy(get(bufoptions, a:name, a:1))
-  else
-    return deepcopy(eval('s:options.' . bufnr('%') . '.' . a:name))
+function! s:get(...) "{{{
+  let options = deepcopy(eval('s:options.' . bufnr('%')))
+  if a:0
+    return options[a:1]
   endif
+  return options
 endfunction "}}}
 
 function! s:exists(name, ...) "{{{
@@ -196,7 +184,17 @@ function! s:get_syn_name() "{{{
   return synIDattr(synIDtrans(synID(line('.'), col, 1)), 'name')
 endfunction " }}}
 
+function! s:is_excluded_ft(ft) "{{{
+  if !exists("g:delimitMate_excluded_ft")
+    return 0
+  endif
+  return index(split(g:delimitMate_excluded_ft, ','), a:ft, 0, 1) >= 0
+endfunction "}}}
+
 function! s:is_forbidden(char) "{{{
+  if s:is_excluded_ft(&filetype)
+    return 1
+  endif
   if !s:get('excluded_regions_enabled')
     return 0
   endif
@@ -319,7 +317,7 @@ function! delimitMate#SkipDelim(char) "{{{
     return a:char . "\<Del>"
   elseif delimitMate#IsEmptyPair( pre . a:char )
     " Add closing delimiter and jump back to the middle.
-    return a:char . "\<Left>"
+    return a:char . s:joinUndo() . "\<Left>"
   else
     " Nothing special here, return the same character.
     return a:char
@@ -350,7 +348,7 @@ function! delimitMate#ParenDelim(right) " {{{
   else
     let tail = ''
   endif
-  return left . a:right . tail . repeat("\<Left>", len(split(tail, '\zs')) + 1)
+  return left . a:right . tail . repeat(s:joinUndo() . "\<Left>", len(split(tail, '\zs')) + 1)
 endfunction " }}}
 
 function! delimitMate#QuoteDelim(char) "{{{
@@ -366,7 +364,7 @@ function! delimitMate#QuoteDelim(char) "{{{
     let right_q =  s:rquote(a:char)
     let quotes = right_q > left_q + 1 ? 0 : left_q - right_q + 2
     let lefts = quotes - 1
-    return repeat(a:char, quotes) . repeat("\<Left>", lefts)
+    return repeat(a:char, quotes) . repeat(s:joinUndo() . "\<Left>", lefts)
   elseif char_at == a:char
     " Inside an empty pair, jump out
     return a:char . "\<Del>"
@@ -381,7 +379,7 @@ function! delimitMate#QuoteDelim(char) "{{{
         \ && !empty(s:get('smart_quotes'))
     " Seems like we have an unbalanced quote, insert one quotation
     " mark and jump to the middle.
-    return a:char . "\<Left>"
+    return a:char . s:joinUndo() . "\<Left>"
   else
     " Insert a pair and jump to the middle.
     let sufix = ''
@@ -391,7 +389,7 @@ function! delimitMate#QuoteDelim(char) "{{{
       let has_marker = marker == s:get('eol_marker')
       let sufix = !has_marker ? s:get('eol_marker') : ''
     endif
-    return a:char . a:char . "\<Left>"
+    return a:char . a:char . s:joinUndo() . "\<Left>"
   endif
 endfunction "}}}
 
@@ -406,9 +404,9 @@ function! delimitMate#JumpOut(char) "{{{
     " Ref: https://github.com/Raimondi/delimitMate/issues/168
     return "\<Del>".a:char
   elseif jump == 3
-    return "\<Right>\<Right>"
+    return s:joinUndo() . "\<Right>" . s:joinUndo() . "\<Right>"
   elseif jump == 5
-    return "\<Down>\<C-O>I\<Right>"
+    return "\<Down>\<C-O>I" . s:joinUndo() . "\<Right>"
   else
     return a:char
   endif
@@ -425,12 +423,12 @@ function! delimitMate#JumpAny(...) " {{{
   let char = s:get_char(0)
   if char == " "
     " Space expansion.
-    return "\<Right>\<Right>"
+    return s:joinUndo() . "\<Right>" . s:joinUndo() . "\<Right>"
   elseif char == ""
     " CR expansion.
     return "\<CR>" . getline(line('.') + 1)[0] . "\<Del>\<Del>"
   else
-    return "\<Right>"
+    return s:joinUndo() . "\<Right>"
   endif
 endfunction " delimitMate#JumpAny() }}}
 
@@ -441,10 +439,10 @@ function! delimitMate#JumpMany() " {{{
   for char in line
     if index(s:get('quotes_list'), char) >= 0 ||
           \ index(s:get('right_delims'), char) >= 0
-      let rights .= "\<Right>"
+      let rights .= s:joinUndo() . "\<Right>"
       let found = 1
     elseif found == 0
-      let rights .= "\<Right>"
+      let rights .= s:joinUndo() . "\<Right>"
     else
       break
     endif
@@ -477,7 +475,7 @@ function! delimitMate#ExpandReturn() "{{{
           \ && !search(escape(s:get('eol_marker'), '[]\.*^$').'$', 'cnW', '.')
       let tail = getline('.')[col('.') - 1 : ]
       let times = len(split(tail, '\zs'))
-      let val .= repeat("\<Right>", times) . s:get('eol_marker') . repeat("\<Left>", times + 1)
+      let val .= repeat(s:joinUndo() . "\<Right>", times) . s:get('eol_marker') . repeat(s:joinUndo() . "\<Left>", times + 1)
     endif
     let val .= "\<CR>"
     if &smartindent && !&cindent && !&indentexpr
@@ -510,7 +508,7 @@ function! delimitMate#ExpandSpace() "{{{
           \     && !escaped
   if s:is_empty_matchpair() || expand_inside_quotes
     " Expand:
-    return "\<Space>\<Space>\<Left>"
+    return "\<Space>\<Space>" . s:joinUndo() . "\<Left>"
   else
     return "\<Space>"
   endif
@@ -644,6 +642,14 @@ function! s:test_mappings(list, is_matchpair) "{{{
     endif
     call append('$', '')
   endfor
+endfunction "}}}
+
+function! s:joinUndo() "{{{
+  if v:version < 704
+        \ || ( v:version == 704 && !has('patch849') )
+    return ''
+  endif
+  return "\<C-G>U"
 endfunction "}}}
 
 " vim:foldmethod=marker:foldcolumn=4:ts=2:sw=2

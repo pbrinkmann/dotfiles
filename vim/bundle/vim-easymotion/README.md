@@ -1,6 +1,7 @@
 Vim motion on speed!
 =====
-[![Build Status](https://travis-ci.org/Lokaltog/vim-easymotion.svg?branch=master)](https://travis-ci.org/Lokaltog/vim-easymotion)
+[![Build Status](https://travis-ci.org/easymotion/vim-easymotion.svg?branch=master)](https://travis-ci.org/easymotion/vim-easymotion)
+[![reviewdog](https://github.com/easymotion/vim-easymotion/workflows/reviewdog/badge.svg?branch=master&event=push)](https://github.com/easymotion/vim-easymotion/actions?query=workflow%3Areviewdog+event%3Apush+branch%3Amaster)
 
 ![Animated demonstration](https://f.cloud.github.com/assets/3797062/2039359/a8e938d6-899f-11e3-8789-60025ea83656.gif)
 
@@ -20,7 +21,7 @@ taking over the project from [Lokaltog](https://github.com/Lokaltog). He's
 improved the default motions, implemented many useful new features, and fixed
 some bugs.
 
-EasyMotion is now completely
+EasyMotion is now completely:
 
 - **Well-behaved**: It's consistent with the default motions of Vim and works
   well in all modes. And it now supports repeating with the dot operator.
@@ -29,7 +30,7 @@ EasyMotion is now completely
 
 Even though some default behaviors were modified and many new features were
 added, I carefully considered backward compatibility. So those of you updating
-from older versions can do so without worry and start benefitting immediately
+from older versions can do so without worry and start benefiting immediately
 from all the new features!
 
 Introduction
@@ -46,7 +47,7 @@ highlighted.
 
 EasyMotion is triggered by the provided mappings. This readme only covers the
 basics; please refer to
-[`:help easymotion.txt`](https://github.com/Lokaltog/vim-easymotion/blob/master/doc/easymotion.txt#L86)
+[`:help easymotion.txt`](https://github.com/easymotion/vim-easymotion/blob/master/doc/easymotion.txt#L86)
 to see all the available mappings.
 
 Important notes
@@ -98,9 +99,84 @@ Press `b` to jump to the second "o":
 	Lorem ipsum d<cursor>olor sit amet.
 
 Jeffrey Way of Nettuts+ has also [written
-a tutorial](http://net.tutsplus.com/tutorials/other/vim-essential-plugin-easymotion/)
+a tutorial](https://code.tutsplus.com/tutorials/vim-essential-plugin-easymotion--net-19223)
 about EasyMotion.
 
+New features in version 3.0
+====
+
+### Overwin motions
+![](https://raw.githubusercontent.com/haya14busa/i/2753bd4dd1dfdf5962dbdbffabf24244e4e14243/easymotion/overwin-motions.gif)
+
+EasyMotion now supports moving cursor across/over window.
+Since it doesn't make sense that moving cursor to other window while Visual or
+Operator-pending mode, overwin motions only provides mappings for Normal
+mode.  Please use `nmap` to use overwin motions. Overwin motions only
+supports bi-directional motions.
+
+#### Example configuration
+
+```vim
+" <Leader>f{char} to move to {char}
+map  <Leader>f <Plug>(easymotion-bd-f)
+nmap <Leader>f <Plug>(easymotion-overwin-f)
+
+" s{char}{char} to move to {char}{char}
+nmap s <Plug>(easymotion-overwin-f2)
+
+" Move to line
+map <Leader>L <Plug>(easymotion-bd-jk)
+nmap <Leader>L <Plug>(easymotion-overwin-line)
+
+" Move to word
+map  <Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader>w <Plug>(easymotion-overwin-w)
+```
+
+#### Integration with incsearch.vim
+- [haya14busa/incsearch.vim](https://github.com/haya14busa/incsearch.vim)
+- [haya14busa/incsearch-easymotion.vim](https://github.com/haya14busa/incsearch-easymotion.vim)
+
+```vim
+" You can use other keymappings like <C-l> instead of <CR> if you want to
+" use these mappings as default search and sometimes want to move cursor with
+" EasyMotion.
+function! s:incsearch_config(...) abort
+  return incsearch#util#deepextend(deepcopy({
+  \   'modules': [incsearch#config#easymotion#module({'overwin': 1})],
+  \   'keymap': {
+  \     "\<CR>": '<Over>(easymotion)'
+  \   },
+  \   'is_expr': 0
+  \ }), get(a:, 1, {}))
+endfunction
+
+noremap <silent><expr> /  incsearch#go(<SID>incsearch_config())
+noremap <silent><expr> ?  incsearch#go(<SID>incsearch_config({'command': '?'}))
+noremap <silent><expr> g/ incsearch#go(<SID>incsearch_config({'is_stay': 1}))
+```
+
+### Bonus fuzzy-search with EasyMotion
+
+![](https://raw.githubusercontent.com/haya14busa/i/eab1d12a8bd322223d551956a4fd8a21d5c4bfe9/easymotion/fuzzy-incsearch-easymotion.gif)
+
+- [haya14busa/incsearch.vim](https://github.com/haya14busa/incsearch.vim)
+- [haya14busa/incsearch-fuzzy.vim](https://github.com/haya14busa/incsearch-fuzzy.vim)
+- [haya14busa/incsearch-easymotion.vim](https://github.com/haya14busa/incsearch-easymotion.vim)
+
+```vim
+function! s:config_easyfuzzymotion(...) abort
+  return extend(copy({
+  \   'converters': [incsearch#config#fuzzyword#converter()],
+  \   'modules': [incsearch#config#easymotion#module({'overwin': 1})],
+  \   'keymap': {"\<CR>": '<Over>(easymotion)'},
+  \   'is_expr': 0,
+  \   'is_stay': 1
+  \ }), get(a:, 1, {}))
+endfunction
+
+noremap <silent><expr> <Space>/ incsearch#go(<SID>config_easyfuzzymotion())
+```
 
 New features in version 2.0
 ====
@@ -108,7 +184,7 @@ New features in version 2.0
 ### Two key highlighting
 
 When EasyMotion runs out of single characters to highlight movement targets, it
-now shows you immediately the keys you have to press.
+immediately shows you the keys you have to press.
 
 In previous versions you could not see the next character you would need to
 press until you entered the first one. This made movement over long distances
@@ -117,7 +193,7 @@ get to your destination.
 
 ### Bidirectional motions
 
-All motions now come in a bidirectional variants (e.g. `<Plug>(easymotion-s)`,
+All motions now come in bidirectional variants (e.g. `<Plug>(easymotion-s)`,
 `<Plug>(easymotion-bd-w)` and so forth).
 By default, you can already jump forward or backward with `<Leader>s`. A useful
 trick is to map `nmap s <Plug>(easymotion-s)` to use `s` instead and save one
@@ -125,7 +201,7 @@ keystroke!
 
 ### 2-character search motion
 
-You can now also perform a 2-character search, similar to [vim-seek](https://github.com/goldfeld/vim-seek)/[vim-sneak](https://github.com/justinmk/vim-sneak) with `<Plug>(easymotion-s2)`. For example you can highlight all words that start with `fu`.
+You can now also perform a 2-character search, similar to [vim-seek](https://github.com/goldfeld/vim-seek)/[vim-sneak](https://github.com/justinmk/vim-sneak) with `<Plug>(easymotion-s2)`. For example, you can highlight all words that start with `fu`.
 
 ![2-key-find-motion](https://f.cloud.github.com/assets/3797062/2039612/7cafcec8-89a5-11e3-8f2c-5f26a6b83efd.gif)
 
@@ -137,9 +213,9 @@ nmap t <Plug>(easymotion-t2)
 
 ### n-character search motion
 
-You can also search for `n` characters, which basically can be used to replace the default search of Vim.
+You can also search for `n` characters, which can be used to replace the default search of Vim.
 It supports incremental highlighting and you can use `<Tab>` and `<S-Tab>` to scroll down/up a page. If you press
-`<CR>` you get the usual EasyMotion highlighting and can jump to any matching target destination with a
+`<CR>`, you get the usual EasyMotion highlighting and can jump to any matching target destination with a
 single keystroke.
 
 What sounds complicated should become clear if you look at the following examples.
@@ -180,7 +256,7 @@ map <Leader>j <Plug>(easymotion-j)
 map <Leader>k <Plug>(easymotion-k)
 map <Leader>h <Plug>(easymotion-linebackward)
 
-let g:EasyMotion_startofline = 0 " keep cursor colum when JK motion
+let g:EasyMotion_startofline = 0 " keep cursor column when JK motion
 ```
 
 ### Smartcase & Smartsign
@@ -241,7 +317,7 @@ input characters to find the last motion again.
 This requires https://github.com/tpope/vim-repeat.
 
 You can use EasyMotion with operators and press `.` to repeat!
-It is well-behaved, and consistent with the default behavior of Vim.
+It is well-behaved and consistent with the default behavior of Vim.
 
 ![repeat-motion](https://f.cloud.github.com/assets/3797062/2039538/0aef66aa-89a4-11e3-8242-c27a5208cfca.gif)
 
@@ -267,17 +343,27 @@ Installation
 ------------
 ### Pathogen (https://github.com/tpope/vim-pathogen)
 ```
-git clone https://github.com/Lokaltog/vim-easymotion ~/.vim/bundle/vim-easymotion
+git clone https://github.com/easymotion/vim-easymotion ~/.vim/bundle/vim-easymotion
 ```
 
 ### Vundle (https://github.com/gmarik/vundle)
 ```
-Plugin 'Lokaltog/vim-easymotion'
+Plugin 'easymotion/vim-easymotion'
 ```
 
 ### NeoBundle (https://github.com/Shougo/neobundle.vim)
 ```
-NeoBundle 'Lokaltog/vim-easymotion'
+NeoBundle 'easymotion/vim-easymotion'
+```
+
+### Vim-Plug (https://github.com/junegunn/vim-plug)
+```
+Plug 'easymotion/vim-easymotion'
+```
+
+### Vim8 Native Plugin Manager (https://vimhelp.org/repeat.txt.html#packages)
+```
+git clone https://github.com/easymotion/vim-easymotion.git ~/.vim/pack/plugins/start/vim-easymotion
 ```
 
 Minimal Configuration Tutorial
@@ -287,23 +373,22 @@ Minimal Configuration Tutorial
 **Please do not be satisfied with just installing vim-easymotion, configuring it yourself boost your productivity more and more!**
 
 Default `<Leader><Leader>` prefix isn't easy to press, and I leave them just for backwards compatibility.
-You should at least change prefix key like this `map <Leader> <Plug>(easymotion-prefix)`
+You should at least change the prefix key like this `map <Leader> <Plug>(easymotion-prefix)`
 
 Minimal but useful vimrc example:
 
-```
+```vim
 let g:EasyMotion_do_mapping = 0 " Disable default mappings
 
-" Bi-directional find motion
 " Jump to anywhere you want with minimal keystrokes, with just one key binding.
 " `s{char}{label}`
-nmap s <Plug>(easymotion-s)
+nmap s <Plug>(easymotion-overwin-f)
 " or
 " `s{char}{char}{label}`
 " Need one more keystroke, but on average, it may be more comfortable.
-nmap s <Plug>(easymotion-s2)
+nmap s <Plug>(easymotion-overwin-f2)
 
-" Turn on case insensitive feature
+" Turn on case-insensitive feature
 let g:EasyMotion_smartcase = 1
 
 " JK motions: Line motions
@@ -316,6 +401,6 @@ Now, all you need to remember is `s` and JK motions bindings, and it's good enou
 
 **`<Leader>j`** & **`<Leader>k`** make it easy to move to the lines.
 
-Of course you can use any key you want instead of `s` such as `<Space>`, `<Leader>s`, etc...
+Of course, you can use any key you want instead of `s` such as `<Space>`, `<Leader>s`, etc...
 
-If you want to use more useful mappings, please see [:h easymotion.txt](https://github.com/Lokaltog/vim-easymotion/blob/master/doc/easymotion.txt) for more detail.
+If you want to use more useful mappings, please see [:h easymotion.txt](https://github.com/easymotion/vim-easymotion/blob/master/doc/easymotion.txt) for more detail.

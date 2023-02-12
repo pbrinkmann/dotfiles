@@ -1,4 +1,4 @@
-*easymotion.txt*	Version 2.1
+*easymotion.txt*        Version 3.0
 
 
             ______                  __  ___       __  _
@@ -33,10 +33,12 @@ CONTENTS                                                 *easymotion-contents*
        EasyMotion_add_search_history ... |EasyMotion_add_search_history|
        EasyMotion_off_screen_search .... |EasyMotion_off_screen_search|
        EasyMotion_disable_two_key_combo. |EasyMotion_disable_two_key_combo|
+       EasyMotion_verbose .............. |EasyMotion_verbose|
        Custom highlighting ............. |easymotion-custom-hl|
        Custom mappings ................. |easymotion-custom-mappings|
            Leader key .................. |easymotion-leader-key|
            Custom keys ................. |easymotion-custom-keys|
+       Autocommands .................... |easymotion-autocommands|
     License ............................ |easymotion-license|
     Known bugs ......................... |easymotion-known-bugs|
     Contributing ....................... |easymotion-contributing|
@@ -217,6 +219,12 @@ EasyMotion <Plug> table                                *easymotion-plug-table*
     <Plug>(easymotion-Tln)            | See |<Plug>(easymotion-Tln)|
     <Plug>(easymotion-bd-tln)         | See |<Plug>(easymotion-bd-tln)|
 
+    Over Window Motion                | (No assignment by default)
+    ----------------------------------|---------------------------------
+    <Plug>(easymotion-overwin-f)      | See |<Plug>(easymotion-overwin-f)|
+    <Plug>(easymotion-overwin-f2)     | See |<Plug>(easymotion-overwin-f2)|
+    <Plug>(easymotion-overwin-line)   | See |<Plug>(easymotion-overwin-line)|
+    <Plug>(easymotion-overwin-w)      | See |<Plug>(easymotion-overwin-w)|
 
 ------------------------------------------------------------------------------
 More mappings                                        *easymotion-more-mappings*
@@ -245,13 +253,88 @@ Bidirection ~
                 End of word forward and backward. See |e| & |ge|.
 
 <Plug>(easymotion-bd-E)                               *<Plug>(easymotion-bd-E)*
-                End of WORD forward and backward. See |e| & |ge|.
+                End of WORD forward and backward. See |E| & |gE|.
 
 <Plug>(easymotion-bd-jk)                             *<Plug>(easymotion-bd-jk)*
                 Line downward and upward. See |j| & |k|.
 
 <Plug>(easymotion-bd-n)                               *<Plug>(easymotion-bd-n)*
                 Jump to latest "/" or "?" forward. See |n| & |N|.
+
+                                                *easymotion-overwin-motions*
+Overwin Motions~
+
+Overwin motions supports moving cursor across/over |window|. Since it
+doesn't make sense that moving cursor to other window while |Visual| or
+|Operator-pending| mode, overwin motions only provides mappings for |Normal|
+mode.  Please use |nmap| to use overwin motions. overwin motions only
+supports bi-directional motions.
+
+<Plug>(easymotion-overwin-f){char}          *n_<Plug>(easymotion-overwin-f)*
+                Like |<Plug>(easymotion-s)| or |<Plug>(easymotion-bd-f)|, but
+                supports moving cursor to other window. >
+                nmap <Leader>f <Plug>(easymotion-overwin-f)
+                xmap <Leader>f <Plug>(easymotion-bd-f)
+                omap <Leader>f <Plug>(easymotion-bd-f)
+<
+<Plug>(easymotion-overwin-f2){char}{char}   *n_<Plug>(easymotion-overwin-f2)*
+                Like |<Plug>(easymotion-s2)| or |<Plug>(easymotion-bd-f2)|,
+                but supports moving cursor to other window. >
+                nmap <Leader>s <Plug>(easymotion-overwin-f2)
+                xmap <Leader>s <Plug>(easymotion-bd-f2)
+                omap <Leader>s <Plug>(easymotion-bd-f2)
+<
+<Plug>(easymotion-overwin-line)           *n_<Plug>(easymotion-overwin-line)*
+                Like |<Plug>(easymotion-bd-jk)| but supports moving cursor to
+                other window. >
+                nmap <Leader>L <Plug>(easymotion-overwin-line)
+                xmap <Leader>L <Plug>(easymotion-bd-jk)
+                omap <Leader>L <Plug>(easymotion-bd-jk)
+<
+<Plug>(easymotion-overwin-w)              *n_<Plug>(easymotion-overwin-w)*
+                Like |<Plug>(easymotion-bd-w)| but supports moving cursor to
+                other window. >
+                nmap <Leader>w <Plug>(easymotion-overwin-w)
+                xmap <Leader>w <Plug>(easymotion-bd-w)
+                omap <Leader>w <Plug>(easymotion-bd-w)
+<
+For overwin n-character find motions~
+                          *easymotion-do-not-support-overwin-n-char-motions*
+                Overwin n-character find motions is equivalent to
+                *<Plug>(easymotion-overwin-sn)* (doesn't exist. It's like
+                |<Plug>(easymotion-sn)| but supports moving cursor to other
+                window).
+                EasyMotion itself doesn't support this mapping, but with
+                |incsearch.vim|[1] and incsearch-easymotion.vim[2], you can get
+                equivalent mappings. incsearch.vim is more compatible with
+                Vim's default search and it works with EasyMotion.
+
+                [1] https://github.com/haya14busa/incsearch.vim
+                [2] https://github.com/haya14busa/incsearch-easymotion.vim
+>
+  " You can use other keymappings like <C-l> instead of <CR> if you want to
+  " use these mappings as default search and somtimes want to move cursor with
+  " EasyMotion.
+  function! s:incsearch_config(...) abort
+    return incsearch#util#deepextend(deepcopy({
+    \   'modules': [incsearch#config#easymotion#module({'overwin': 1)],
+    \   'keymap': {
+    \     "\<CR>": '<Over>(easymotion)'
+    \   },
+    \   'is_expr': 0
+    \ }), get(a:, 1, {}))
+  endfunction
+
+  noremap <silent><expr> /  incsearch#go(<SID>incsearch_config())
+  noremap <silent><expr> ?  incsearch#go(<SID>incsearch_config({'command': '?'}))
+  noremap <silent><expr> g/ incsearch#go(<SID>incsearch_config({'is_stay': 1}))
+<
+                                                *easymotion-overwin-limitation*
+Since archtecture of overwin motions is different from other easymotion
+motions, there are some limitations.
+
+    1. Highlight for target is always EasyMotionTarget (|EasyMotion_highlight|)
+       even for two key targets.
 
 Jump To Anywhere ~
 
@@ -309,7 +392,7 @@ Repeat ~
         downloaded here: https://github.com/justinmk/vim-sneak
 
 EasyMotion dot repeat~
-                                    *easymotion-dotrepeat* *easymotion-textobjct*
+                                    *easymotion-dotrepeat* *easymotion-textobject*
 
         This feature requires tpope/vim-repeat
         https://github.com/tpope/vim-repeat
@@ -342,9 +425,9 @@ JK Motion ~
 JK motion option                    *<Plug>(easymotion-j)* *<Plug>(easymotion-k)*
                                                     *g:EasyMotion_startofline*
 
-        The default behavior of the |j| and |k| is to move your cursor to the
-        start of the line. Set this option to 0 to force the cursor to stay in
-        the same column If you want to use both movements as separate
+        The default behavior of the |j| and |k| keys is to move your cursor to
+        the start of the line. Set this option to 0 to force the cursor to stay
+        in the same column. If you want to use both movements as separate
         mappings, set |'g:EasyMotion_startofline'| to 0 and map
         |<Plug>(easymotion-sol-j)| & |<Plug>(easymotion-sol-k)| to the start
         of line mapping:
@@ -400,7 +483,7 @@ Search motion respect previous direction
 
     This is vim compatible |n| & |N| easymotion. Unlike |<Plug>(easymotion-n)|
     and |<Plug>(easymotion-N)| 's direction is always forward or backward,
-    these motions consider previous search direction. 
+    these motions consider previous search direction.
 
 Within line motion ~
                                                        *easymotion-within-line*
@@ -490,11 +573,21 @@ Within line motion ~
         \       '(\l)\zs(\u)' . '|' .
 
 Multi Input Find Motion!~
-                                                       *easymotion-multi-input*
-                                                           *easymotion-two-key*
-                                                           *easymotion-{find}n*
-                                                   *<Plug>(easymotion-{find}n)*
-                                                   *<Plug>(easymotion-{find}2)*
+All Find motions (s,f,F,t,T,sl,fl,Fl,tl,Tl, see below) support this feature!
+(|l| means within line motion)
+    *easymotion-multi-input* *easymotion-two-key* *easymotion-{find}n*
+    *<Plug>(easymotion-{find}n)* *<Plug>(easymotion-{find}2)*
+    *<Plug>(easymotion-s2)* *<Plug>(easymotion-f2)* *<Plug>(easymotion-F2)*
+    *<Plug>(easymotion-t2)* *<Plug>(easymotion-T2)*
+    *<Plug>(easymotion-bd-f2)* *<Plug>(easymotion-bd-t2)*
+    *<Plug>(easymotion-sl2)* *<Plug>(easymotion-fl2)* *<Plug>(easymotion-Fl2)*
+    *<Plug>(easymotion-tl2)* *<Plug>(easymotion-Tl2)*
+    *<Plug>(easymotion-bd-fl2)* *<Plug>(easymotion-bd-tl2)*
+
+    *<Plug>(easymotion-sn)* *<Plug>(easymotion-fn)* *<Plug>(easymotion-Fn)*
+    *<Plug>(easymotion-tn)* *<Plug>(easymotion-Tn)* *<Plug>(easymotion-bd-tn)*
+    *<Plug>(easymotion-sln)* *<Plug>(easymotion-fln)* *<Plug>(easymotion-Fln)*
+    *<Plug>(easymotion-tln)* *<Plug>(easymotion-Tln)* *<Plug>(easymotion-bd-tln)*
 
 EasyMotion provide another find motion by multi input target.
 
@@ -529,19 +622,6 @@ keymapping,
 >
     let g:EasyMotion_inc_highlight = 0
 <
-All Find motions (s,f,F,t,T,sl,fl,Fl,tl,Tl, see below) support this feature!
-(|l| means within line motion)
-
-    *<Plug>(easymotion-sn)* *<Plug>(easymotion-fn)* *<Plug>(easymotion-Fn)*
-    *<Plug>(easymotion-tn)* *<Plug>(easymotion-Tn)* *<Plug>(easymotion-bd-tn)*
-    *<Plug>(easymotion-sln)* *<Plug>(easymotion-fln)* *<Plug>(easymotion-Fln)*
-    *<Plug>(easymotion-tln)* *<Plug>(easymotion-Tln)* *<Plug>(easymotion-bd-tln)*
-
-
-    *<Plug>(easymotion-s2)* *<Plug>(easymotion-f2)* *<Plug>(easymotion-F2)*
-    *<Plug>(easymotion-t2)* *<Plug>(easymotion-T2)* *<Plug>(easymotion-bd-t2)*
-    *<Plug>(easymotion-sl2)* *<Plug>(easymotion-fl2)* *<Plug>(easymotion-Fl2)*
-    *<Plug>(easymotion-tl2)* *<Plug>(easymotion-Tl2)* *<Plug>(easymotion-bd-tl2)*
 
 Find Motion Command Line~
                                                       *easymotion-command-line*
@@ -634,7 +714,7 @@ Vi-compatible mode must be disabled.
 If your vim version is causing you problems with using this plugin, feel free
 to open an issue on github!
 
-Link: https://github.com/Lokaltog/vim-easymotion/issues
+Link: https://github.com/easymotion/vim-easymotion/issues
 
 ==============================================================================
 Configuration                                        *easymotion-configuration*
@@ -812,7 +892,7 @@ With this option enabled, |Easymotion| will shows target labels with
 uppercase letters, but allow you to type it in lowercase and have Easymotion
 automatically convert it uppercase.
 
-This feature improve targets' readability.
+This feature improves targets' readability.
 
 Example: >
 
@@ -923,7 +1003,7 @@ EasyMotion_add_search_history                 *g:EasyMotion_add_search_history*
 EasyMotion_off_screen_search                   *g:EasyMotion_off_screen_search*
 
     If you set this option to 1, the 'n' key find motion will search patterns
-    even outside of the current screen range. If you want to disable this
+    even outside the current screen range. If you want to disable this
     feature, set this value to 0.
 >
     let g:EasyMotion_off_screen_search = 0
@@ -937,6 +1017,16 @@ EasyMotion_disable_two_key_combo           *g:EasyMotion_disable_two_key_combo*
     let g:EasyMotion_disable_two_key_combo = 1
 <
     Default: 0
+
+EasyMotion_verbose                       *g:EasyMotion_verbose*
+
+    If you set this option to 0, you can disable all the messages the plugin
+    creates, such as "EasyMotion: Jumping to [l,c]" and "EasyMotion:
+    Cancelled".
+>
+    let g:EasyMotion_verbose = 0
+<
+    Default: 1
 
 ------------------------------------------------------------------------------
 Custom highlighting                                      *easymotion-custom-hl*
@@ -957,6 +1047,12 @@ to groups with default values. The highlighting groups are:
 
       Highlights shaded text, the default value is dark gray
 
+    * EasyMotionIncSearch
+    * EasyMotionMoveHL
+
+      Highlights matched pattern of "/" command.
+
+
 There are two ways to override the default colors:
 
    1) Set the highlighting in your color scheme
@@ -972,6 +1068,9 @@ There are two ways to override the default colors:
 
           hi EasyMotionTarget2First ctermbg=none ctermfg=red
           hi EasyMotionTarget2Second ctermbg=none ctermfg=lightred
+
+          hi EasyMotionMoveHL ctermbg=green ctermfg=black
+          hi EasyMotionIncSearch ctermbg=green ctermfg=black
 <
    2) Set the highlighting in your vimrc
 
@@ -988,6 +1087,9 @@ There are two ways to override the default colors:
 
           hi link EasyMotionTarget2First MatchParen
           hi link EasyMotionTarget2Second MatchParen
+
+          hi link EasyMotionMoveHL Search
+          hi link EasyMotionIncSearch Search
 <
 
 Use CSApprox                                        *EasyMotion_force_csapprox*
@@ -1038,12 +1140,34 @@ Example: >
 See |easymotion-plug-table| for a table of motions that can be mapped
 and their default values.
 
+------------------------------------------------------------------------------
+Autocommands                                          *easymotion-autocommands*
+                                    *EasyMotionPromptBegin* *EasyMotionPromptEnd*
+
+EasyMotion invokes two |User| autocommands, |EasyMotionPromptBegin| and
+|EasyMotionPromptEnd|, so you can temporarily disable your linter to avoid
+annoying syntax errors.
+
+EasyMotionPromptBegin       Before the content of buffer is changed with
+                            markers. If EasyMotion directly jumps to the
+                            target (no prompts given), this autocommand will
+                            not be executed.
+
+EasyMotionPromptEnd         After the content of buffer and the undo tree are
+                            restored.
+
+Example with coc.nvim: >
+
+    autocmd User EasyMotionPromptBegin silent! CocDisable
+    autocmd User EasyMotionPromptEnd   silent! CocEnable
+<
+
 ==============================================================================
 License                                                    *easymotion-license*
 
 License: MIT license
 
-Copyright (c) 2014-2015 Kim Silkebækken, haya14busa
+Copyright (c) 2014-2016 Kim Silkebækken, haya14busa
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1066,7 +1190,7 @@ SOFTWARE.
 ==============================================================================
 Known bugs                                              *easymotion-known-bugs*
 
-See: https://github.com/Lokaltog/vim-easymotion/issues
+See: https://github.com/easymotion/vim-easymotion/issues
 
 Pull Requests are welcome! :)
 
@@ -1079,7 +1203,7 @@ have any code improvements.
 
 Author: Kim Silkebækken <kim.silkebaekken+vim@gmail.com>
         haya14busa <hayabusa1419@gmail.com> (since version 2.0)
-Source repository: https://github.com/Lokaltog/vim-easymotion
+Source repository: https://github.com/easymotion/vim-easymotion
 
 
 ==============================================================================
@@ -1098,7 +1222,7 @@ Credits                                                    *easymotion-credits*
 - mattn: fix multibyte handling
 - yuex: fix visual mode selection bug (o command)
 
-and more!: https://github.com/Lokaltog/vim-easymotion/graphs/contributors
+and more!: https://github.com/easymotion/vim-easymotion/graphs/contributors
 
 EasyMotion is based on Bartlomiej Podolak's great PreciseJump script, which
 can be downloaded here:

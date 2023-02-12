@@ -1,4 +1,4 @@
-if exists("g:loaded_syntastic_postprocess_autoload") || !exists("g:loaded_syntastic_plugin")
+if exists('g:loaded_syntastic_postprocess_autoload') || !exists('g:loaded_syntastic_plugin')
     finish
 endif
 let g:loaded_syntastic_postprocess_autoload = 1
@@ -61,6 +61,17 @@ function! syntastic#postprocess#guards(errors) abort " {{{2
             let e['lnum'] = guards[e['bufnr']]
         endif
     endfor
+
+    return a:errors
+endfunction " }}}2
+
+" convert error messages from UTF-8 to the current encoding
+function! syntastic#postprocess#iconv(errors) abort " {{{2
+    if has('iconv') && &encoding !=# '' && &encoding !=# 'utf-8'
+        for e in a:errors
+            let e['text'] = iconv(e['text'], "utf-8", &encoding)
+        endfor
+    endif
 
     return a:errors
 endfunction " }}}2

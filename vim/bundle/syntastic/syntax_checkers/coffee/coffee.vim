@@ -1,6 +1,6 @@
 "============================================================================
 "File:        coffee.vim
-"Description: Syntax checking plugin for syntastic.vim
+"Description: Syntax checking plugin for syntastic
 "Maintainer:  Lincoln Stoll <l@lds.li>
 "License:     This program is free software. It comes without any warranty,
 "             to the extent permitted by applicable law. You can redistribute
@@ -13,7 +13,7 @@
 " Note: this script requires CoffeeScript version 1.6.2 or newer.
 "
 
-if exists("g:loaded_syntastic_coffee_coffee_checker")
+if exists('g:loaded_syntastic_coffee_coffee_checker')
     finish
 endif
 let g:loaded_syntastic_coffee_coffee_checker = 1

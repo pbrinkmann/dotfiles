@@ -1,6 +1,6 @@
 "============================================================================
 "File:        yaml.vim
-"Description: Syntax checking plugin for syntastic.vim
+"Description: Syntax checking plugin for syntastic
 "Maintainer:  Martin Grenfell <martin.grenfell at gmail dot com>
 "License:     This program is free software. It comes without any warranty,
 "             to the extent permitted by applicable law. You can redistribute
@@ -10,7 +10,7 @@
 "
 "============================================================================
 
-if exists("g:loaded_syntastic_yaml_jsyaml_checker")
+if exists('g:loaded_syntastic_yaml_jsyaml_checker')
     finish
 endif
 let g:loaded_syntastic_yaml_jsyaml_checker = 1
@@ -28,12 +28,13 @@ function! SyntaxCheckers_yaml_jsyaml_GetLocList() dict
     let errorformat =
         \ 'Error on line %l\, col %c:%m,' .
         \ 'JS-YAML: %m at line %l\, column %c:,' .
+        \ 'YAMLException: %m at line %l\, column %c:,' .
         \ '%-G%.%#'
 
     return SyntasticMake({
         \ 'makeprg': makeprg,
         \ 'errorformat': errorformat,
-        \ 'defaults': {'bufnr': bufnr("")} })
+        \ 'defaults': {'bufnr': bufnr('')} })
 endfunction
 
 call g:SyntasticRegistry.CreateAndRegisterChecker({

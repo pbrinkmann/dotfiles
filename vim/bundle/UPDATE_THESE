@@ -1,15 +1,16 @@
-git subtree pull --squash -P vim/bundle/syntastic https://github.com/scrooloose/syntastic.git master
-git subtree pull --squash -P vim/bundle/ctrlp https://github.com/kien/ctrlp.vim.git master
-git subtree pull --squash -P vim/bundle/tagbar https://github.com/majutsushi/tagbar.git master
-git subtree pull --squash -P vim/bundle/vim-airline https://github.com/bling/vim-airline.git master
-git subtree pull --squash -P vim/bundle/vim-easymotion https://github.com/Lokaltog/vim-easymotion.git master
-git subtree pull --squash -P vim/bundle/vim-fugitive https://github.com/tpope/vim-fugitive.git master
-git subtree pull --squash -P vim/bundle/delimitMate https://github.com/Raimondi/delimitMate.git master
-git subtree pull --squash -P vim/bundle/tabular https://github.com/godlygeek/tabular.git master
-git subtree pull --squash -P vim/bundle/vim-argwrap https://github.com/FooSoft/vim-argwrap.git master
-git subtree pull --squash -P vim/bundle/vim-surround https://github.com/FooSoft/vim-surround.git master
 git subtree pull --squash -P vim/bundle/bufexplorer https://github.com/jlanzarotta/bufexplorer.git master
 git subtree pull --squash -P vim/bundle/CamelCaseMotion https://github.com/bkad/CamelCaseMotion.git master
+git subtree pull --squash -P vim/bundle/ctrlp https://github.com/kien/ctrlp.vim.git master
+git subtree pull --squash -P vim/bundle/delimitMate https://github.com/Raimondi/delimitMate.git master
+git subtree pull --squash -P vim/bundle/syntastic https://github.com/scrooloose/syntastic.git master
+git subtree pull --squash -P vim/bundle/tabular https://github.com/godlygeek/tabular.git master
+git subtree pull --squash -P vim/bundle/tagbar https://github.com/majutsushi/tagbar.git master
+git subtree pull --squash -P vim/bundle/vim-airline https://github.com/bling/vim-airline.git master
+git subtree pull --squash -P vim/bundle/vim-airline-themes https://github.com/vim-airline/vim-airline-themes.git master
+git subtree pull --squash -P vim/bundle/vim-argwrap https://github.com/FooSoft/vim-argwrap.git master
+git subtree pull --squash -P vim/bundle/vim-easymotion https://github.com/Lokaltog/vim-easymotion.git master
+git subtree pull --squash -P vim/bundle/vim-fugitive https://github.com/tpope/vim-fugitive.git master
+git subtree pull --squash -P vim/bundle/vim-surround https://github.com/FooSoft/vim-surround.git master
 
 #For example, to add new ones:
 #
@@ -18,4 +19,3 @@ git subtree pull --squash -P vim/bundle/CamelCaseMotion https://github.com/bkad/
 #And add to the above list
 
 
-git subtree add --squash --prefix=vim/bundle/CamelCaseMotion https://github.com/bkad/CamelCaseMotion.git master
